@@ -18,7 +18,7 @@ app.use(
 app.post("/new-event", async (req, res) => {
   const { message } = req.body;
 
-  const messageText = message?.text?.toLowerCase()?.trim();
+  const messageText = message?.text?.trim();
   const chatId = message?.chat?.id;
 
   if (!messageText || !chatId) {
