@@ -15,6 +15,16 @@ app.use(
   })
 );
 
+app.post("/send", async (req, res) => {
+  const { message } = req.body;
+  const chatId = message?.chat?.id;
+
+  await axios.post(TELEGRAM_API, {
+    chat_id: chatId,
+    text: "Что хотите отправить?",
+  });
+});
+
 app.post("/new-event", async (req, res) => {
   const { message } = req.body;
 
