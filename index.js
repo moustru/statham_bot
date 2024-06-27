@@ -1,59 +1,20 @@
-import axios from "axios";
-import { config } from "dotenv";
-import express from "express";
+import { Telegraf } from "telegraf";
+import { message } from "telegraf/filters";
 
-config();
-const app = express();
+const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
-const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_API_TOKEN}/sendMessage`;
-const PORT = process.env.PORT || 3000;
+bot.start((ctx) => ctx.reply("Добро пожаловать!"));
+bot.help((ctx) => ctx.reply("Пока не могу помочь, брат, давай сам"));
 
-app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
-
-app.post("/send", async (req, res) => {
-  const { message } = req.body;
-  const chatId = message?.chat?.id;
-
-  await axios.post(TELEGRAM_API, {
-    chat_id: chatId,
-    text: "Что хотите отправить?",
-  });
+bot.command("send", (ctx) => {
+  return ctx.reply("Что хочешь отправить?");
 });
 
-app.post("/new-event", async (req, res) => {
-  const { message } = req.body;
-
-  const messageText = message?.text?.trim();
-  const chatId = message?.chat?.id;
-
-  if (!messageText || !chatId) {
-    return res.sendStatus(400);
-  }
-
-  let responseText = "Не знаю, что сказать";
-
-  if (messageText === "Антон") {
-    responseText = "Знаю этого типа";
-  }
-
-  try {
-    await axios.post(TELEGRAM_API, {
-      chat_id: chatId,
-      text: responseText,
-    });
-
-    res.send("Done");
-  } catch (e) {
-    console.log(e);
-    res.send(e);
-  }
+bot.on(message(), (ctx) => {
+  return ctx.reply("Брат, пока не умею общаться");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+bot.launch();
+
+process.once("SIGINT", () => bot.stop("SIGINT"));
+process.once("SIGTERM", () => bot.stop("SIGTERM"));
