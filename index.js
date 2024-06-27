@@ -38,9 +38,18 @@ bot.on(message(), (ctx) => {
           ctx.reply(`Брат, отправил на ${channel}`);
         })
         .catch((e) => {
-          ctx.reply(
-            `Не могу отправить сообщение, брат, причина - ${e.message}`
-          );
+          switch (true) {
+            case e.message.startsWith("400"):
+              ctx.reply("Не могу отправить сообщение, брат, канал не найден");
+              break;
+            case e.message.startsWith("403"):
+              ctx.reply("Не могу отправить сообщение, брат, у меня нет прав");
+              break;
+            default:
+              ctx.reply(
+                `Не могу отправить сообщение, брат, причина - ${e.message}`
+              );
+          }
         });
 
       channels = [];
