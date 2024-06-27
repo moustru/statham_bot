@@ -1,6 +1,6 @@
 import express from "express";
 import { Telegraf } from "telegraf";
-import { message, callbackQuery } from "telegraf/filters";
+import { message } from "telegraf/filters";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -20,7 +20,7 @@ bot.help((ctx) =>
 let channels = [];
 
 bot.on(message(), (ctx) => {
-  if (ctx.message.text.startsWith("///")) {
+  if (ctx.message.text?.startsWith("///")) {
     channels = [...ctx.message.text.split(" ")];
     channels.shift();
     return;
@@ -32,16 +32,20 @@ bot.on(message(), (ctx) => {
     );
   } else {
     channels.forEach((channel) => {
-      ctx.copyMessage(channel).catch(console.log);
-      ctx.reply(`Брат, отправил на ${channel}`);
+      ctx
+        .copyMessage(channel)
+        .then(() => {
+          ctx.reply(`Брат, отправил на ${channel}`);
+        })
+        .catch((e) => {
+          ctx.reply(
+            `Не могу отправить сообщение, брат, причина - ${e.message}`
+          );
+        });
+
+      channels = [];
     });
-
-    channels = [];
   }
-});
-
-bot.createWebhook({
-  domain: "https://moustru-statham-bot-d3d8.twc1.net",
 });
 
 bot.launch();
